@@ -57,6 +57,16 @@ class MyAppState extends ChangeNotifier {
   이렇게 하면 앱의 위젯이 상태를 알 수 있습니다.
   */
   var current = WordPair.random();
+
+  /*
+  새 getNext() 메서드는 임의의 새 WordPair를 current에 재할당합니다.
+  또한 MyAppState를 보고 있는 사람에게 알림을 보내는 notifyListeners()(ChangeNotifier)의 메서드)를 호출합니다.
+  이제 남은 작업은 버튼의 콜백에서 getNext 메서드를 호출하는 것입니다.
+  */
+  void getNext() {
+    current = WordPair.random();
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -94,7 +104,7 @@ class MyHomePage extends StatelessWidget {
           Text(appState.current.asLowerCase),
           ElevatedButton(
             onPressed: () {
-              print('button pressed!');
+              appState.getNext();
             },
             child: Text('Next'),
           ),
