@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 22, 119, 26)),
         ),
         home: MyHomePage(),
       ),
@@ -75,11 +76,11 @@ class MyHomePage extends StatelessWidget {
   */
   @override
   Widget build(BuildContext context) {
-
     /*
     MyHomePage는 watch 메서드를 사용하여 앱의 현재 상태에 관한 변경사항을 추적합니다.
     */
     var appState = context.watch<MyAppState>();
+    var pair = appState.current;
 
     /*
     모든 build 메서드는 위젯 또는 중첩된 위젯 트리(좀 더 일반적임)를 반환해야 합니다.
@@ -93,30 +94,97 @@ class MyHomePage extends StatelessWidget {
       기본적으로 열은 시각적으로 하위 요소를 상단에 배치합니다.
       열이 중앙에 위치하도록 이를 곧 변경합니다.
       */
-      body: Column(
-        children: [
-          Text('A random AWESOME idea:'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BigCard(pair: pair),
+            SizedBox(height: 10), // 공간만 차지하고 자체적으로는 아무것도 렌더링하지 않습니다. 시각적 '간격'을 만들 때 흔히 사용됩니다.
+            ElevatedButton(
+              onPressed: () {
+                appState.getNext();
+              },
+              child: Text('Next'),
+            ),
+          ],
           /*
-          이 두 번째 Text 위젯은 appState를 사용하고 해당 클래스의 유일한 멤버인 current(즉, WordPair)에 액세스합니다.
-          WordPair는 asPascalCase 또는 asSnakeCase 등 여러 유용한 getter를 제공합니다.
-          여기서는 asLowerCase를 사용하지만 대안 중 하나가 더 좋다면 지금 변경해도 됩니다.
+          Flutter 코드에서는 후행 쉼표를 많이 사용합니다.
+          이 특정 쉼표는 여기 없어도 됩니다.
+          children이 이 특정 Column 매개변수 목록의 마지막 멤버이자 유일한 멤버이기 때문입니다.
+          그러나 일반적으로 후행 쉼표를 사용하는 것이 좋습니다.
+          멤버를 더 추가하는 작업이 쉬워지고 Dart의 자동 형식 지정 도구에서 줄바꿈을 추가하도록 힌트 역할을 합니다.
+          자세한 내용은 코드 형식 지정을 참고하세요.
           */
-          Text(appState.current.asLowerCase),
-          ElevatedButton(
-            onPressed: () {
-              appState.getNext();
-            },
-            child: Text('Next'),
-          ),
-        ],
-        /*
-        Flutter 코드에서는 후행 쉼표를 많이 사용합니다.
-        이 특정 쉼표는 여기 없어도 됩니다.
-        children이 이 특정 Column 매개변수 목록의 마지막 멤버이자 유일한 멤버이기 때문입니다.
-        그러나 일반적으로 후행 쉼표를 사용하는 것이 좋습니다.
-        멤버를 더 추가하는 작업이 쉬워지고 Dart의 자동 형식 지정 도구에서 줄바꿈을 추가하도록 힌트 역할을 합니다.
-        자세한 내용은 코드 형식 지정을 참고하세요.
-        */
+        ),
+      ),
+    );
+  }
+}
+
+class BigCard extends StatelessWidget {
+  /*
+  BigCard 클래스의 생성자를 정의합니다.
+  const 키워드는 이 위젯이 불변임을 나타냅니다.
+  super.key는 부모 클래스의 생성자에 키를 전달합니다.
+  required this.pair는 pair라는 필수 매개변수를 받아서 클래스의 pair 필드에 할당합니다.
+  */
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  /*
+  pair라는 이름의 WordPair 타입의 변수를 선언합니다.
+  final 키워드는 이 변수가 한 번만 설정될 수 있으며 이후에 변경될 수 없음을 나타냅니다.
+  */
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    /*
+    build 메서드는 Flutter 위젯의 핵심 메서드로, 위젯 트리를 생성합니다.
+    @override는 이 메서드가 부모 클래스 (StatelessWidget)의 메서드를 재정의하고 있음을 나타냅니다.
+    */
+
+    /*
+    Theme.of(context)로 앱의 현재 테마를 요청합니다.
+    테마의 colorScheme 속성과 동일하도록 카드의 색상을 정의합니다.
+    색 구성표에는 여러 색상이 포함되어 있으며 primary가 앱을 정의하는 가장 두드러진 색상입니다.
+    */
+    final theme = Theme.of(context);
+
+    /*
+    theme.textTheme, 을 사용하여 앱의 글꼴 테마에 액세스합니다.
+    이 클래스에는 bodyMedium(중간 크기의 표준 텍스트용) 또는 caption(이미지 설명용), headlineLarge(큰 헤드라인용) 등의 멤버가 포함되어 있습니다.
+
+    displayMedium 속성은 디스플레이 텍스트를 위한 큰 스타일입니다.
+    여기서 디스플레이라는 단어는 디스플레이 서체와 같은 인쇄상의 의미로 사용됩니다.
+    displayMedium 문서에는 '디스플레이 스타일은 짧고 중요한 텍스트용으로 예약되어 있습니다'(여기 사용 사례와 정확히 일치함)라고 나옵니다.
+
+    테마의 displayMedium 속성은 이론적으로 null일 수 있습니다.
+    이 앱을 작성하는 데 사용하는 Dart라는 프로그래밍 언어는 null에 안전하므로 null이 될 수 있는 객체의 메서드를 개발자가 호출할 수 없습니다.
+    하지만 이 경우 ! 연산자('bang 연산자')를 사용하여 개발자가 잘 알고 하는 작업임을 Dart에 알릴 수 있습니다.
+    displayMedium은 이 경우 null이 아닌 것이 분명하지만 그 이유에 관한 내용은 이 Codelab에서 다루지 않습니다.
+
+    displayMedium에서 copyWith()를 호출하면 정의된 변경사항이 포함된 텍스트 스타일의 사본이 반환됩니다.
+    여기서는 텍스트의 색상만 변경합니다.
+
+    새로운 색상을 가져오려면 앱의 테마에 다시 액세스해야 합니다.
+    색 구성표의 onPrimary 속성은 앱의 기본 색상으로 사용하기 적합한 색상을 정의합니다.
+
+    */
+    final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
+    return Card(
+      color: theme.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          pair.asLowerCase,
+          style: style,
+          semanticsLabel: pair.asPascalCase, // Text의 semanticsLabel 속성을 사용하여 텍스트 위젯의 시각적 콘텐츠를 스크린 리더에 더 적합한 시맨틱 콘텐츠로 재정의합니다.
+        ),
       ),
     );
   }
