@@ -115,55 +115,63 @@ class _MyHomePageState extends State<MyHomePage> {
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
-    /*
-    모든 build 메서드는 위젯 또는 중첩된 위젯 트리(좀 더 일반적임)를 반환해야 합니다.
-    여기서 최상위 위젯은 Scaffold입니다.
-    이 Codelab에서는 Scaffold를 사용하지 않지만 유용한 위젯이며 대부분의 실제 Flutter 앱에서 찾을 수 있습니다.
-    */
-    return Scaffold(
-      body: Row(
-        children: [
-          /*
-          SafeArea는 하위 요소가 하드웨어 노치나 상태 표시줄로 가려지지 않도록 합니다.
-          이 앱에서 이 위젯은 NavigationRail를 래핑하여 탐색 버튼이 휴대기기 상태 표시줄로 가려지지 않도록 합니다.
-          */
-          SafeArea(
-            child: NavigationRail(
-              extended: false, // true로 변경 시 라벨이 아이콘 옆에 표시됩니다.
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home),
-                  label: Text('Home'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
-                  label: Text('Favorites'),
-                ),
-              ],
-              selectedIndex: selectedIndex,
+    return LayoutBuilder(
+      /*
+      LayoutBuilder의 builder 콜백은 제약 조건이 변경될 때마다 호출됩니다. 예를 들어 다음과 같은 경우 발생합니다.
+      - 사용자가 앱의 창 크기를 조절합니다.
+      - 사용자가 휴대전화를 세로 모드에서 가로 모드로 또는 그 반대로 회전합니다.
+      - MyHomePage 옆에 있는 일부 위젯의 크기가 커져 MyHomePage의 제약 조건이 작아집니다.
+      - 기타 등등
+
+      이제 코드에서 현재 constraints를 쿼리하여 라벨을 표시할지 결정할 수 있습니다. 
+      */
+      builder: (context, constraints) {
+        return Scaffold(
+          body: Row(
+            children: [
               /*
-              사용자가 대상 중 하나를 선택할 때 발생하는 작업을 정의합니다.
+              SafeArea는 하위 요소가 하드웨어 노치나 상태 표시줄로 가려지지 않도록 합니다.
+              이 앱에서 이 위젯은 NavigationRail를 래핑하여 탐색 버튼이 휴대기기 상태 표시줄로 가려지지 않도록 합니다.
               */
-              onDestinationSelected: (value) {
-                setState(() {
-                  selectedIndex = value;  
-                });
-              },
-            ),
+              SafeArea(
+                child: NavigationRail(
+                  extended: constraints.maxWidth >= 600, // true로 변경 시 라벨이 아이콘 옆에 표시됩니다.
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite),
+                      label: Text('Favorites'),
+                    ),
+                  ],
+                  selectedIndex: selectedIndex,
+                  /*
+                  사용자가 대상 중 하나를 선택할 때 발생하는 작업을 정의합니다.
+                  */
+                  onDestinationSelected: (value) {
+                    setState(() {
+                      selectedIndex = value;  
+                    });
+                  },
+                ),
+              ),
+              /*
+              Expanded 위젯은 행과 열에서 대단히 유용합니다.
+              이 위젯을 사용하면 일부 하위 요소는 필요한 만큼만 공간을 차지하고(여기서는 NavigationRail) 다른 위젯은 남은 공간을 최대한 차지해야 하는(여기서는 Expanded) 레이아웃을 표현할 수 있습니다.
+              Expanded 위젯은 '탐욕스럽다'고 생각하면 됩니다.
+              */
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page,
+                ),
+              ),
+            ],
           ),
-          /*
-          Expanded 위젯은 행과 열에서 대단히 유용합니다.
-          이 위젯을 사용하면 일부 하위 요소는 필요한 만큼만 공간을 차지하고(여기서는 NavigationRail) 다른 위젯은 남은 공간을 최대한 차지해야 하는(여기서는 Expanded) 레이아웃을 표현할 수 있습니다.
-          Expanded 위젯은 '탐욕스럽다'고 생각하면 됩니다.
-          */
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,
-            ),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 }
