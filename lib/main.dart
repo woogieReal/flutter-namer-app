@@ -97,7 +97,61 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /*
-    MyHomePage는 watch 메서드를 사용하여 앱의 현재 상태에 관한 변경사항을 추적합니다.
+    모든 build 메서드는 위젯 또는 중첩된 위젯 트리(좀 더 일반적임)를 반환해야 합니다.
+    여기서 최상위 위젯은 Scaffold입니다.
+    이 Codelab에서는 Scaffold를 사용하지 않지만 유용한 위젯이며 대부분의 실제 Flutter 앱에서 찾을 수 있습니다.
+    */
+    return Scaffold(
+      body: Row(
+        children: [
+          /*
+          SafeArea는 하위 요소가 하드웨어 노치나 상태 표시줄로 가려지지 않도록 합니다.
+          이 앱에서 이 위젯은 NavigationRail를 래핑하여 탐색 버튼이 휴대기기 상태 표시줄로 가려지지 않도록 합니다.
+          */
+          SafeArea(
+            child: NavigationRail(
+              extended: false, // true로 변경 시 라벨이 아이콘 옆에 표시됩니다.
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: 0,
+              /*
+              사용자가 대상 중 하나를 선택할 때 발생하는 작업을 정의합니다.
+              */
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),
+          ),
+          /*
+          Expanded 위젯은 행과 열에서 대단히 유용합니다.
+          이 위젯을 사용하면 일부 하위 요소는 필요한 만큼만 공간을 차지하고(여기서는 NavigationRail) 다른 위젯은 남은 공간을 최대한 차지해야 하는(여기서는 Expanded) 레이아웃을 표현할 수 있습니다.
+          Expanded 위젯은 '탐욕스럽다'고 생각하면 됩니다.
+          */
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    /*
+    GeneratorPage watch 메서드를 사용하여 앱의 현재 상태에 관한 변경사항을 추적합니다.
     */
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
@@ -109,53 +163,32 @@ class MyHomePage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
-    /*
-    모든 build 메서드는 위젯 또는 중첩된 위젯 트리(좀 더 일반적임)를 반환해야 합니다.
-    여기서 최상위 위젯은 Scaffold입니다.
-    이 Codelab에서는 Scaffold를 사용하지 않지만 유용한 위젯이며 대부분의 실제 Flutter 앱에서 찾을 수 있습니다.
-    */
-    return Scaffold(
-      /*
-      Column은 Flutter에서 가장 기본적인 레이아웃 위젯 중 하나입니다.
-      하위 요소를 원하는 대로 사용하고 이를 위에서 아래로 열에 배치합니다.
-      기본적으로 열은 시각적으로 하위 요소를 상단에 배치합니다.
-      열이 중앙에 위치하도록 이를 곧 변경합니다.
-      */
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(pair: pair),
-            SizedBox(height: 10), // 공간만 차지하고 자체적으로는 아무것도 렌더링하지 않습니다, 시각적 '간격'을 만들 때 흔히 사용됩니다.
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: Text('Like'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                  },
-                  child: Text('Next'),
-                ),
-              ],
-            ),
-          ],
-          /*
-          Flutter 코드에서는 후행 쉼표를 많이 사용합니다.
-          이 특정 쉼표는 여기 없어도 됩니다.
-          children이 이 특정 Column 매개변수 목록의 마지막 멤버이자 유일한 멤버이기 때문입니다.
-          그러나 일반적으로 후행 쉼표를 사용하는 것이 좋습니다.
-          멤버를 더 추가하는 작업이 쉬워지고 Dart의 자동 형식 지정 도구에서 줄바꿈을 추가하도록 힌트 역할을 합니다.
-          자세한 내용은 코드 형식 지정을 참고하세요.
-          */
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10), // 공간만 차지하고 자체적으로는 아무것도 렌더링하지 않습니다, 시각적 '간격'을 만들 때 흔히 사용됩니다.
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
