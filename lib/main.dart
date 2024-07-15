@@ -68,6 +68,26 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+
+  /*
+  MyAppState에 새 속성 favorites를 추가했습니다.
+  이 속성은 빈 목록([])으로 초기화됩니다.
+
+  또한 제네릭을 사용하여 목록에 <WordPair>[] 단어 쌍만 포함될 수 있다고 지정했습니다.
+  이렇게 하면 앱이 더 강력해집니다.
+  Dart는 개발자가 WordPair 외 다른 것을 추가하려고 하면 앱을 실행하는 것조차 거부합니다.
+  결국 숨겨져 있는 원치 않는 객체(예: null)가 있을 수 없음을 알고 favorites 목록을 사용할 수 있습니다.
+  */
+  var favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -81,6 +101,13 @@ class MyHomePage extends StatelessWidget {
     */
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
+
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
     /*
     모든 build 메서드는 위젯 또는 중첩된 위젯 트리(좀 더 일반적임)를 반환해야 합니다.
@@ -99,12 +126,25 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             BigCard(pair: pair),
-            SizedBox(height: 10), // 공간만 차지하고 자체적으로는 아무것도 렌더링하지 않습니다. 시각적 '간격'을 만들 때 흔히 사용됩니다.
-            ElevatedButton(
-              onPressed: () {
-                appState.getNext();
-              },
-              child: Text('Next'),
+            SizedBox(height: 10), // 공간만 차지하고 자체적으로는 아무것도 렌더링하지 않습니다, 시각적 '간격'을 만들 때 흔히 사용됩니다.
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+              ],
             ),
           ],
           /*
